@@ -8,9 +8,6 @@ from mock import patch, MagicMock
 from nose.tools import assert_raises, assert_equal
 from .. import command,greengraphertools
 
-def test_example():
-    assert_equal(1,1,msg='Here is my great message')
-
 def test_construct_Map():
     #Tests the Map object constructor with a mocks to prevent interaction with the internet
     with patch.object(requests,'get') as mock_get:
@@ -37,4 +34,17 @@ def test_green_when_map_not_green():
             green_pixels = mock_map.green(1.1)
             all_false = np.zeros([5,5])
             outcome = np.array_equal(green_pixels,all_false)
+            assert_equal(outcome,True)
+
+def test_green_when_map_all_green():
+    #Tests the Map.green() method when the map has all green pixels
+    with patch.object(requests,'get') as mock_get:
+        with patch.object(img,'imread') as mock_imread:
+            mock_map = greengraphertools.Map(111,222)
+            green_array = np.zeros([5,5,3])
+            green_array[:,:,1] = 1
+            mock_map.pixels = green_array
+            green_pixels = mock_map.green(1.1)
+            all_true = np.ones([5,5])
+            outcome = np.array_equal(green_pixels,all_true)
             assert_equal(outcome,True)
