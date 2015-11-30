@@ -1,3 +1,6 @@
+'''
+Unit tests for the greengrapher module
+'''
 import numpy as np
 import requests
 from matplotlib import image as img
@@ -9,6 +12,7 @@ def test_example():
     assert_equal(1,1,msg='Here is my great message')
 
 def test_construct_Map():
+    #Tests the Map object constructor with a mocks to prevent interaction with the internet
     with patch.object(requests,'get') as mock_get:
         with patch.object(img,'imread') as mock_imread:
             mock_map = greengraphertools.Map(111,222)
@@ -23,17 +27,14 @@ def test_construct_Map():
         'maptype':'satellite'})
 
 
-def test_green():
-
+def test_green_when_map_not_green():
+    #Tests the Map.green() method when the map has no green pixels
     with patch.object(requests,'get') as mock_get:
         with patch.object(img,'imread') as mock_imread:
             mock_map = greengraphertools.Map(111,222)
             not_green_array = np.ones([5,5,3])
             mock_map.pixels = not_green_array
-            tmp = mock_map.green(1.1)
+            green_pixels = mock_map.green(1.1)
             all_false = np.zeros([5,5])
-            outcome = np.array_equal(tmp,all_false)
+            outcome = np.array_equal(green_pixels,all_false)
             assert_equal(outcome,True)
-
-
-#test_green()
