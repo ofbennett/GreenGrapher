@@ -218,3 +218,34 @@ def test_process():
                         mock_green_between.assert_called_with(expected.steps)
                         mock_savefig.assert_called_with(expected.out)
                         mock_plot.assert_called_with(trial_data)
+
+def test_process_with_negative_step_number():
+    #Test command.process method using mocks
+    from argparse import ArgumentParser
+    from matplotlib import pyplot as plt
+
+    begin = test_data['begin']
+    end = test_data['end']
+    steps = test_data['steps']
+    steps = -1*steps
+    out = test_data['out']
+    trial_data = test_data['trial_data']
+
+    class Expected(object):
+        def __init__(self,begin,end,steps,out):
+            self.begin = begin
+            self.end = end
+            self.steps = steps
+            self.out = out
+
+    expected = Expected(begin,end,steps,out)
+
+    with patch.object(ArgumentParser,'parse_args') as mock_parse_args:
+        mock_parse_args.return_value = expected
+        with patch.object(greengraphertools.Greengraph,'green_between') as mock_green_between:
+            mock_green_between.return_value = trial_data
+            with patch.object(plt,'savefig') as mock_savefig:
+                with patch.object(plt,'show') as mock_show:
+                    with patch.object(plt,'plot') as mock_plot:
+                        with assert_raises(ValueError) as exception:
+                            command.process()

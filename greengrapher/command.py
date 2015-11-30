@@ -9,7 +9,10 @@ def process():
     parser.add_argument('--steps','-s',help = 'Number of equal steps between cities to show greenness. Default is 20.',default = 20,type = int)
     parser.add_argument('--out','-o',default = 'graph.png',help = 'Name of output file to save graph to',type = str)
     arguments = parser.parse_args()
-    #print arguments.begin, arguments.end, arguments.steps
+
+    if arguments.steps < 1:
+        raise ValueError('Steps number must be a positive integer greater than 0')
+
     mygraph = Greengraph(arguments.begin,arguments.end)
     data = mygraph.green_between(arguments.steps)
     plt.plot(data)
