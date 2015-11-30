@@ -33,6 +33,8 @@ with open(os.path.join(os.path.dirname(__file__),'fixtures','green_array.yaml'))
 with open(os.path.join(os.path.dirname(__file__),'fixtures','test_data.yaml')) as data_in:
     test_data = yaml.load(data_in)
 
+#All test functions defined below:
+
 def test_construct_Map():
     #Tests the Map class constructor with a mocks to prevent interaction with the internet
     with patch.object(requests,'get') as mock_get:
