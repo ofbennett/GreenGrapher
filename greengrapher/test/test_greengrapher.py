@@ -4,10 +4,34 @@ Unit tests for the greengrapher module
 import numpy as np
 import requests
 import yaml
+import os
 from matplotlib import image as img
 from mock import patch, MagicMock
 from nose.tools import assert_raises, assert_equal
 from .. import command,greengraphertools
+
+#Fixtures loaded below. Comments describe the content of each fixture file.
+
+# not_green_array = np.ones([5,5,3])
+with open(os.path.join(os.path.dirname(__file__),'fixtures','not_green_array.yaml')) as data_in:
+    not_green_array = yaml.load(data_in)
+
+# green_array = np.zeros([5,5,3])
+# green_array[:,:,1] = 1
+with open(os.path.join(os.path.dirname(__file__),'fixtures','green_array.yaml')) as data_in:
+    green_array = yaml.load(data_in)
+
+# begin_cood = [1,1]
+# end_cood = [10,10]
+# steps = 10
+# expected_seq =  [[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],[8,8],[9,9],[10,10]]
+# green_counts = [1,1,2,4,3,4,5,3,4,7]
+# begin = 'London'
+# end = 'Oxford'
+# out = 'graph2.png'
+# trial_data = 123
+with open(os.path.join(os.path.dirname(__file__),'fixtures','test_data.yaml')) as data_in:
+    test_data = yaml.load(data_in)
 
 def test_construct_Map():
     #Tests the Map class constructor with a mocks to prevent interaction with the internet
@@ -29,16 +53,6 @@ def test_construct_Map():
 def test_green_when_map_not_green():
     #Tests the Map.green() method when the map has no green pixels
 
-    # import os
-    # cwd = os.getcwd()
-    # with open(cwd +'/greengrapher/test/fixtures/not_green_array.yaml') as data_in:
-    #     not_green_array = yaml.load(data_in)
-
-    with open('not_green_array.yaml') as data_in:
-        not_green_array = yaml.load(data_in)
-
-    # not_green_array = np.ones([5,5,3])
-
     with patch.object(requests,'get') as mock_get:
         with patch.object(img,'imread') as mock_imread:
             mock_map = greengraphertools.Map(111,222)
@@ -51,8 +65,6 @@ def test_green_when_map_not_green():
 
 def test_green_when_map_all_green():
     #Tests the Map.green() method when the map has all green pixels
-    green_array = np.zeros([5,5,3])
-    green_array[:,:,1] = 1
 
     with patch.object(requests,'get') as mock_get:
         with patch.object(img,'imread') as mock_imread:
@@ -66,7 +78,6 @@ def test_green_when_map_all_green():
 
 def test_count_green_when_map_not_green():
     #Tests the Map.count_green() method when the map has no green pixels
-    not_green_array = np.ones([5,5,3])
 
     with patch.object(requests,'get') as mock_get:
         with patch.object(img,'imread') as mock_imread:
@@ -78,8 +89,6 @@ def test_count_green_when_map_not_green():
 
 def test_count_green_when_map_all_green():
     #Tests the Map.count_green() method when the map has all green pixels
-    green_array = np.zeros([5,5,3])
-    green_array[:,:,1] = 1
 
     with patch.object(requests,'get') as mock_get:
         with patch.object(img,'imread') as mock_imread:
@@ -91,7 +100,6 @@ def test_count_green_when_map_all_green():
 
 def test_show_green_when_map_not_green():
     #Tests the Map.show_green() method when the map has no green pixels
-    not_green_array = np.ones([5,5,3])
 
     from StringIO import StringIO
     with patch.object(requests,'get') as mock_get:
@@ -110,8 +118,6 @@ def test_show_green_when_map_not_green():
 
 def test_show_green_when_map_all_green():
     #Tests the Map.show_green() method when the map has all green pixels
-    green_array = np.zeros([5,5,3])
-    green_array[:,:,1] = 1
 
     from StringIO import StringIO
     with patch.object(requests,'get') as mock_get:
@@ -147,10 +153,11 @@ def test_geolocate():
 
 def test_location_sequence():
     #Test the Greengraph.location_sequence method
-    begin_cood = [1,1]
-    end_cood = [10,10]
-    steps = 10
-    expected_seq =  [[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],[8,8],[9,9],[10,10]]
+
+    begin_cood = test_data['begin_cood']
+    end_cood = test_data['end_cood']
+    steps = test_data['steps']
+    expected_seq = test_data['expected_seq']
 
     graph = greengraphertools.Greengraph('London', 'Oxford')
     result = graph.location_sequence(begin_cood,end_cood,steps)
@@ -160,8 +167,9 @@ def test_location_sequence():
 
 def test_green_between():
     #Test the Greengraph.green_between method with mocks
-    steps = 10
-    green_counts = [1,1,2,4,3,4,5,3,4,7]
+
+    steps = test_data['steps']
+    green_counts = test_data['green_counts']
 
     graph = greengraphertools.Greengraph('London', 'Oxford')
     with patch.object(requests,'get') as mock_get:
@@ -179,11 +187,12 @@ def test_process():
     #Test command.process method using mocks
     from argparse import ArgumentParser
     from matplotlib import pyplot as plt
-    begin = 'London'
-    end = 'Oxford'
-    steps = 10
-    out = 'graph2.png'
-    trial_data = 123
+
+    begin = test_data['begin']
+    end = test_data['end']
+    steps = test_data['steps']
+    out = test_data['out']
+    trial_data = test_data['trial_data']
 
     class Expected(object):
         def __init__(self,begin,end,steps,out):
