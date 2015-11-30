@@ -3,6 +3,7 @@ Unit tests for the greengrapher module
 '''
 import numpy as np
 import requests
+import yaml
 from matplotlib import image as img
 from mock import patch, MagicMock
 from nose.tools import assert_raises, assert_equal
@@ -27,7 +28,16 @@ def test_construct_Map():
 
 def test_green_when_map_not_green():
     #Tests the Map.green() method when the map has no green pixels
-    not_green_array = np.ones([5,5,3])
+
+    # import os
+    # cwd = os.getcwd()
+    # with open(cwd +'/greengrapher/test/fixtures/not_green_array.yaml') as data_in:
+    #     not_green_array = yaml.load(data_in)
+
+    with open('not_green_array.yaml') as data_in:
+        not_green_array = yaml.load(data_in)
+
+    # not_green_array = np.ones([5,5,3])
 
     with patch.object(requests,'get') as mock_get:
         with patch.object(img,'imread') as mock_imread:
@@ -137,15 +147,15 @@ def test_geolocate():
 
 def test_location_sequence():
     #Test the Greengraph.location_sequence method
-    start = [1,1]
-    end = [10,10]
+    begin_cood = [1,1]
+    end_cood = [10,10]
     steps = 10
-    expected = [[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],[8,8],[9,9],[10,10]]
+    expected_seq =  [[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],[8,8],[9,9],[10,10]]
 
     graph = greengraphertools.Greengraph('London', 'Oxford')
-    result = graph.location_sequence(start,end,steps)
+    result = graph.location_sequence(begin_cood,end_cood,steps)
 
-    outcome = np.array_equal(result,expected)
+    outcome = np.array_equal(result,expected_seq)
     assert_equal(outcome,True)
 
 def test_green_between():
@@ -192,7 +202,7 @@ def test_process():
                 with patch.object(plt,'show') as mock_show:
                     with patch.object(plt,'plot') as mock_plot:
                         command.process()
-                        
+
                         mock_parse_args.assert_called_once
                         mock_green_between.assert_called_with(expected.steps)
                         mock_savefig.assert_called_with(expected.out)
