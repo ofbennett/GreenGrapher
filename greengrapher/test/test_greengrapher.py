@@ -112,10 +112,36 @@ def test_construct_Greengraph():
     assert_equal(['London','Oxford'],[graph.start,graph.end])
 
 def test_geolocate():
-    #Tests the Greengraph.geolocate method with a mock
+    #Tests the Greengraph.geolocate method with a mock and a simulated return value for London
     graph = greengraphertools.Greengraph('London', 'Oxford')
     with patch.object(graph.geocoder,'geocode') as mock_geocode:
         mock_geocode.return_value = [[0,(51.5073509, -0.1277583)],[0,0]]
         coordinates = graph.geolocate('London')
         mock_geocode.assert_called_with('London',exactly_one=False)
         assert_equal(coordinates,(51.5073509, -0.1277583))
+
+def test_location_sequence():
+    #Test the Greengraph.location_sequence method
+    start = [1,1]
+    end = [10,10]
+    steps = 10
+    expected = [[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],[8,8],[9,9],[10,10]]
+    graph = greengraphertools.Greengraph('London', 'Oxford')
+    result = graph.location_sequence(start,end,steps)
+    outcome = np.array_equal(result,expected)
+    assert_equal(outcome,True)
+
+def test_green_between():
+    #Test the Greengraph.green_between method with mocks
+    steps = 10
+    green_counts = [1,1,2,4,3,4,5,3,4,7]
+    graph = greengraphertools.Greengraph('London', 'Oxford')
+    with patch.object(requests,'get') as mock_get:
+        with patch.object(img,'imread') as mock_imread:
+            with patch.object(graph, 'geolocate') as mock_geolocate:
+                with patch.object(greengraphertools.Map,'count_green') as mock_count_green:
+                    mock_geolocate.side_effect = [(51.5073509, -0.1277583),
+                                                  (51.7520209, -1.2577263)]
+                    mock_count_green.side_effect = green_counts
+                    result = graph.green_between(steps)
+                    assert_equal(result,green_counts)
