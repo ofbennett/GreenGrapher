@@ -145,3 +145,35 @@ def test_green_between():
                     mock_count_green.side_effect = green_counts
                     result = graph.green_between(steps)
                     assert_equal(result,green_counts)
+
+def test_process():
+    #Test command.process method using mocks
+    from argparse import ArgumentParser
+    from matplotlib import pyplot as plt
+    begin = 'London'
+    end = 'Oxford'
+    steps = 10
+    out = 'graph2.png'
+    trial_data = 123
+
+    class Expected(object):
+        def __init__(self,begin,end,steps,out):
+            self.begin = begin
+            self.end = end
+            self.steps = steps
+            self.out = out
+
+    expected = Expected(begin,end,steps,out)
+    
+    with patch.object(ArgumentParser,'parse_args') as mock_parse_args:
+        mock_parse_args.return_value = expected
+        with patch.object(greengraphertools.Greengraph,'green_between') as mock_green_between:
+            mock_green_between.return_value = trial_data
+            with patch.object(plt,'savefig') as mock_savefig:
+                with patch.object(plt,'show') as mock_show:
+                    with patch.object(plt,'plot') as mock_plot:
+                        command.process()
+                        mock_parse_args.assert_called_once
+                        mock_green_between.assert_called_with(expected.steps)
+                        mock_savefig.assert_called_with(expected.out)
+                        mock_plot.assert_called_with(trial_data)
