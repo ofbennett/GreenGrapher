@@ -9,7 +9,7 @@ from nose.tools import assert_raises, assert_equal
 from .. import command,greengraphertools
 
 def test_construct_Map():
-    #Tests the Map object constructor with a mocks to prevent interaction with the internet
+    #Tests the Map class constructor with a mocks to prevent interaction with the internet
     with patch.object(requests,'get') as mock_get:
         with patch.object(img,'imread') as mock_imread:
             mock_map = greengraphertools.Map(111,222)
@@ -105,3 +105,17 @@ def test_show_green_when_map_all_green():
                 assert_equal({'format':'png'},kwrds)
                 outcome = (np.array_equal(test_array, arg[0]) or np.array_equal(test_array, arg[1]))
                 assert_equal(outcome,True)
+
+def test_construct_Greengraph():
+    #Tests the Greengraph class constructor
+    graph = greengraphertools.Greengraph('London', 'Oxford')
+    assert_equal(['London','Oxford'],[graph.start,graph.end])
+
+def test_geolocate():
+    #Tests the Greengraph.geolocate method with a mock
+    graph = greengraphertools.Greengraph('London', 'Oxford')
+    with patch.object(graph.geocoder,'geocode') as mock_geocode:
+        mock_geocode.return_value = [[0,(51.5073509, -0.1277583)],[0,0]]
+        coordinates = graph.geolocate('London')
+        mock_geocode.assert_called_with('London',exactly_one=False)
+        assert_equal(coordinates,(51.5073509, -0.1277583))
