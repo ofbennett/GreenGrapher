@@ -1,0 +1,19 @@
+begin: London
+begin_cood: [1, 1]
+end: Oxford
+end_cood: [10, 10]
+expected_seq:
+- [1, 1]
+- [2, 2]
+- [3, 3]
+- [4, 4]
+- [5, 5]
+- [6, 6]
+- [7, 7]
+- [8, 8]
+- [9, 9]
+- [10, 10]
+green_counts: [1, 1, 2, 4, 3, 4, 5, 3, 4, 7]
+out: graph2.png
+steps: 10
+trial_data: 123
