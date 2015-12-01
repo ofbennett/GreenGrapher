@@ -9,7 +9,7 @@ The package is installed by running the setup.py script:
 
 python setup.py install
 
-The command line interface is shown below. The entry point script greengraph.py either needs to be in the current directory or in the search path to be run!
+The command line interface for the program is shown below. The entry point script greengraph.py either needs to be in the current directory or in the systems's search path to be run!
 
 greengraph.py [-h] [--begin BEGIN] [--end END] [--steps STEPS] [--out OUT]
 
