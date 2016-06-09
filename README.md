@@ -1,7 +1,8 @@
 This is the README file for the greengrapher package
 
 By Oscar Bennett, UCL
-Student Number - 14087294
+
+Based on code written by James Hetherington (this code found at https://github.com/jamespjh/greengraph).
 
 This package generates, displays and then saves a graph of the amount of green map between two selected cities in the world. The greenness is sampled at a user chosen number of steps between the two cities (default = 20).
 
